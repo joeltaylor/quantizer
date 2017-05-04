@@ -1,5 +1,5 @@
 # Quantizer
-Arduino quantizer and S&H for modular synth aplications.
+Arduino quantizer and S&H for modular synth applications.
 
 Features (for while)
 <ul>Inputs
