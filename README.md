@@ -2,13 +2,21 @@
 Arduino quantizer and S&H for modular synth aplications.
 
 Features (for while)
+<ul>Inputs
 <li>one voltage input
+<li>external clock sync
+</ul>
+
+<ul>Controls
 <li>octave shift (+/-)
 <li>semitone shift (+/-)
-<li>external clock sync
+<li>7 scales mapped
+</ul>
+
+<ul>Outputs
 <li>5 octaves midi out
 <li>5V quantized voltage out
-<li>7 scales mapped
+</ul>
 
 
 Very soon features:
