@@ -1,52 +1,96 @@
-uint16_t scaleSelect(uint16_t input) {
-  uint8_t value = map(input, 0, 1023, 0, 8);
-  if (value >= (MAXTABLES)) {
-    value = MAXTABLES - 1;
+/*Quantizer
+
+  Creative Commons License
+
+  Quantizer by Pantala Labs is licensed under a
+  Creative Commons Attribution 4.0 International License.
+  Based on a work at https://github.com/PantalaLabs/Quantizer.
+
+  Gibran Curtiss SalomÃ£o. MAY/2017 - CC-BY
+*/
+
+int  scaleSelect(int  input) {
+  int  value = map(input, 0, 1023, 0, maxTables);
+  if (value >= (maxTables)) {
+    value = maxTables - 1;
   }
   return (value);
 }
 
-uint16_t mapMaj(uint16_t input) {
-  uint8_t value = input / 36;
+int  semitoneSelect(int  scaleInput, int  semitonesPerOctave) {
+  int  value = map(scaleInput, 0, 1023, 0, semitonesPerOctave + 1);
+  if (value >= (semitonesPerOctave)) {
+    value = semitonesPerOctave;
+  }
+  return (value);
+}
+
+int  shiftNotes(int note, int shifts, int table[], int tableSize) {
+  int noteIndex;
+  Serial.println("tablesize");
+  Serial.println(tableSize);
+  
+  for (int i = 0; i < tableSize; i++) {
+    if (note == table[i]) {
+      noteIndex = i + shifts;
+      break;
+    }
+  }
+  if (noteIndex > tableSize) {
+    noteIndex = tableSize;
+  }
+  return (table[noteIndex]);
+}
+
+
+int  mapMaj(int  input) {
+  int  value = input / 36;
   return (majTable[value]);
 }
 
-uint16_t mapMin(uint16_t input) {
-  uint8_t value = input / 36;
+int  mapMin(int  input) {
+  int  value = input / 36;
   return (minTable[value]);
 }
 
-uint16_t mapPenta(uint16_t input) {
-  uint8_t value = input / 42;
+int  mapPenta(int  input) {
+  int  value = input / 42;
   return (pentaTable[value]);
 }
 
-uint16_t mapDorian(uint16_t input) {
-  uint8_t value = input / 36;
+int  mapDorian(int  input) {
+  int  value = input / 36;
   return (dorianTable[value]);
 }
 
-uint16_t mapMaj3rd(uint16_t input) {
-  uint8_t value = input / 61;
+int  mapMaj3rd(int  input) {
+  int  value = input / 61;
   return (maj3rdTable[value]);
 }
 
-uint16_t mapMin3rd(uint16_t input) {
-  uint8_t value = input / 59;
+int  mapMin3rd(int  input) {
+  int  value = input / 59;
   return (min3rdTable[value]);
 }
 
-uint16_t mapWh(uint16_t input) {
-  uint8_t value = input / 42;
+int  mapWh(int  input) {
+  int  value = input / 42;
   return (whTable[value]);
 }
 
-uint16_t mapChromatic(uint16_t input) {
-  uint8_t value = input / 21;
+int  mapChromatic(int  input) {
+  int  value = input / 21;
   return (chromaTable[value]);
 }
 
-uint16_t mapMidi(uint16_t input) {
+int  mapMidi(int  input) {
   return (midiTable[input]);
+}
+
+int  deBounceMe(int  readCV, int  oldRead) {
+  if (abs(readCV - oldRead) > debounceRange) {
+    return readCV;
+  }
+  return oldRead;
 }
 
