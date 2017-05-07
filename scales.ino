@@ -17,19 +17,18 @@ int  scaleSelect(int  input) {
   return (value);
 }
 
-int  semitoneSelect(int  scaleInput, int  semitonesPerOctave) {
-  int  value = map(scaleInput, 0, 1023, 0, semitonesPerOctave + 1);
-  if (value >= (semitonesPerOctave)) {
-    value = semitonesPerOctave;
-  }
+int  octaveSelect(int  input) {
+  int  value = map(input, 0, 1023, -4, 4);
+  return (value);
+}
+
+int  semitoneSelect(int  input, int  semitonesPerOctave) {
+  int  value = map(input, 0, 1023, -(semitonesPerOctave - 1) , semitonesPerOctave - 1);
   return (value);
 }
 
 int  shiftNotes(int note, int shifts, int table[], int tableSize) {
   int noteIndex;
-  Serial.println("tablesize");
-  Serial.println(tableSize);
-  
   for (int i = 0; i < tableSize; i++) {
     if (note == table[i]) {
       noteIndex = i + shifts;
@@ -38,6 +37,9 @@ int  shiftNotes(int note, int shifts, int table[], int tableSize) {
   }
   if (noteIndex > tableSize) {
     noteIndex = tableSize;
+  }
+  if (noteIndex < 0) {
+    noteIndex = 0;
   }
   return (table[noteIndex]);
 }
@@ -87,7 +89,7 @@ int  mapMidi(int  input) {
   return (midiTable[input]);
 }
 
-int  deBounceMe(int  readCV, int  oldRead) {
+int  softDebounce(int  readCV, int  oldRead) {
   if (abs(readCV - oldRead) > debounceRange) {
     return readCV;
   }
