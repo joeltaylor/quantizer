@@ -4,9 +4,13 @@
 
   Quantizer by Pantala Labs is licensed under a
   Creative Commons Attribution 4.0 International License.
-  Based on a work at https://github.com/PantalaLabs/Quantizer.
+  Based on a work at https://www.muffwiggler.com/forum/viewtopic.php?t=50137&highlight=
 
   Gibran Curtiss SalomÃ£o. MAY/2017 - CC-BY
+
+  Original work: 
+  Author : SATINDAS 
+  Code: https://www.muffwiggler.com/forum/viewtopic.php?t=50137&highlight=
 */
 
 int  midiTable[] = {
