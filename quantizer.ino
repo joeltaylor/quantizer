@@ -20,7 +20,8 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 #define ledPin              8
 
 //analogic pins
-#define cvIn1Pin            A2
+#define cvIn1Pin            A0
+#define cvIn2Pin            A1
 #define semitoneShiftPin    A5
 #define octaveShiftPin      A6
 #define scaleSelectorPin    A7
@@ -32,10 +33,10 @@ int octaveSize          = 0;
 int lastNotePlayed      = 0;
 int tempNote;
 
-unsigned long     lastTrigger;
+unsigned long lastTrigger;
 
-volatile boolean  pleaseReadCv = true;
-boolean           triggerOn = false;
+volatile boolean pleaseReadCv = true;
+boolean         triggerOn = false;
 
 boolean debugMe = false;
 
@@ -60,7 +61,9 @@ void tickInterrupt() {
 
 void loop() {
   int quantizedNoteCV1  = 0;
+//  int cv2Offset         = 0;
   int debouncedReadCV1  = 0;
+  int debouncedReadCV2  = 0;
   int scaleRead         = 0;
   int octaveOffset      = 0;
   int semitoneOffset    = 0;
@@ -76,57 +79,68 @@ void loop() {
     pleaseReadCv    = false;
     triggerOn       = true;
     lastNotePlayed  = quantizedNoteCV1;
-    debouncedReadCV1    = softDebounce(analogRead(cvIn1Pin), debouncedReadCV1);  //withoutdebounce
+    debouncedReadCV1    = softDebounce(analogRead(cvIn1Pin), debouncedReadCV1); 
+    debouncedReadCV2    = softDebounce(analogRead(cvIn2Pin), debouncedReadCV2); 
     scaleRead           = scaleSelect(softDebounce(analogRead(scaleSelectorPin), scaleRead));
     octaveOffset        = octaveSelect(softDebounce(analogRead(octaveShiftPin), octaveOffset));
     switch (scaleRead) {
       case  0:
         octaveSize = 12;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapChromatic(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, chromaTable, sizeof(chromaTable));
+        tempNote  = mapChromatic(debouncedReadCV1+debouncedReadCV2);
+        //cv2Offset = noteSelect(mapChromatic(debouncedReadCV2), chromaTable, sizeof(chromaTable));
+        //notesToShift = cv2Offset + (octaveOffset * octaveSize) + semitoneOffset;
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, chromaTable, sizeof(chromaTable));
         break;
       case  1:
         octaveSize = 7;
         semitoneOffset = semitoneSelect(softDebounce(analogRead(semitoneShiftPin), semitoneOffset), octaveSize);
-        tempNote = mapMaj(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, majTable, sizeof(majTable));
+        tempNote = mapMaj(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, majTable, sizeof(majTable));
         break;
       case  2:
         octaveSize = 7;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapMin(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, minTable, sizeof(minTable));
+        tempNote = mapMin(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, minTable, sizeof(minTable));
         break;
       case  3:
         octaveSize = 6;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapPenta(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, pentaTable, sizeof(pentaTable));
+        tempNote = mapPenta(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, pentaTable, sizeof(pentaTable));
         break;
       case  4:
         octaveSize = 7;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapDorian(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, dorianTable, sizeof(dorianTable));
+        tempNote = mapDorian(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, dorianTable, sizeof(dorianTable));
         break;
       case  5:
         octaveSize = 4;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapMaj3rd(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, maj3rdTable, sizeof(maj3rdTable));
+        tempNote = mapMaj3rd(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, maj3rdTable, sizeof(maj3rdTable));
         break;
       case  6:
         octaveSize = 4;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapMin3rd(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, min3rdTable, sizeof(min3rdTable));
+        tempNote = mapMin3rd(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift, min3rdTable, sizeof(min3rdTable));
         break;
       case  7:
         octaveSize = 4;
         semitoneOffset = semitoneSelect(analogRead(semitoneShiftPin), octaveSize);
-        tempNote = mapWh(debouncedReadCV1);
-        quantizedNoteCV1 = shiftNotes(tempNote, (octaveOffset * octaveSize) + semitoneOffset, whTable, sizeof(whTable));
+        tempNote = mapWh(debouncedReadCV1+debouncedReadCV2);
+        notesToShift = (octaveOffset * octaveSize) + semitoneOffset;
+        quantizedNoteCV1 = shiftNotes(tempNote, notesToShift , whTable, sizeof(whTable));
         break;
     }
 
@@ -156,8 +170,7 @@ void loop() {
       Serial.print(semitoneOffset);
       Serial.print(" Shift:");
       Serial.print(notesToShift);
-      String strg;
-      strg = quantizedNoteCV1;
+      String strg = String(quantizedNoteCV1);
       Serial.print(" Quant:");
       Serial.print(strg);
       Serial.print(" DAC:");

@@ -27,6 +27,23 @@ int  semitoneSelect(int  input, int  semitonesPerOctave) {
   return (value);
 }
 
+int noteSelect(int note, int table[], int tableSize) {
+  int noteIndex;
+  for (int i = 0; i < tableSize; i++) {
+    if (note == table[i]) {
+      noteIndex = i;
+      break;
+    }
+  }
+  if (noteIndex > tableSize) {
+    noteIndex = tableSize;
+  }
+  if (noteIndex < 0) {
+    noteIndex = 0;
+  }
+  return(noteIndex);
+}
+
 int  shiftNotes(int note, int shifts, int table[], int tableSize) {
   int noteIndex;
   for (int i = 0; i < tableSize; i++) {
