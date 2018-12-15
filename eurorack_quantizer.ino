@@ -3,6 +3,11 @@
   Quantizer by Pantala Labs is licensed under a
   Creative Commons Attribution 4.0 International License.
   Gibran Curtiss SalomÃ£o. MAY/2017 - CC-BY-SA
+
+  TO-DO: 
+  a)calibrate the final voltage on CV out using a table for each midi note
+  b)make a continuous reading on A6 , and use interrupt on RISING
+  
 */
 #include <Wire.h>
 #include <Adafruit_MCP4725.h>
