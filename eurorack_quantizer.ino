@@ -6,8 +6,6 @@
 
   TO-DO: 
   a)calibrate the final voltage on CV out using a table for each midi note
-  b)make a continuous reading on A6 , and use interrupt on RISING
-  
 */
 #include <Wire.h>
 #include <Adafruit_MCP4725.h>
@@ -15,42 +13,51 @@ Adafruit_MCP4725 dac;
 #include <MIDI.h>
 MIDI_CREATE_DEFAULT_INSTANCE();
 
-#define TRIGGERPIN  2
-#define QTZOPTION   3
-#define CVINPIN     A6
+#define TRIGGERPIN 2
+#define QTZOPTION 3
+#define CVINPIN A6
 boolean pleaseQuantizeMe;
-int     lastNote = 0;
-int     cvRead;
-int     noteQuantized;
-int     voltageQuantized;
+int lastNote = 0;
+int cvRead;
+int noteQuantized;
+int voltageQuantized;
 
 boolean debugMe = false;
 
-void setup() {
+void setup()
+{
   pinMode(TRIGGERPIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(TRIGGERPIN), tickInterrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(TRIGGERPIN), tickInterrupt, RISING);
   pinMode(QTZOPTION, INPUT);
-  if (debugMe) {
+  if (debugMe)
+  {
     Serial.begin(9600);
   }
-  else {
+  else
+  {
     dac.begin(0x62);
     MIDI.begin();
   }
 }
 
-void tickInterrupt() {
+void tickInterrupt()
+{
   pleaseQuantizeMe = true;
 }
 
-void loop() {
-  if (pleaseQuantizeMe) {
+void loop()
+{
+  cvRead = analogRead(CVINPIN);
+  if (pleaseQuantizeMe)
+  {
     pleaseQuantizeMe = false;
-    cvRead = analogRead(CVINPIN);
     noteQuantized = map(cvRead, 0, 1023, 0, 60);
-    if (digitalRead(QTZOPTION)) {
+    if (digitalRead(QTZOPTION))
+    {
       voltageQuantized = map(noteQuantized, 0, 60, 0, 4095);
-    } else {
+    }
+    else
+    {
       voltageQuantized = cvRead << 2;
     }
     MIDI.sendNoteOff(lastNote, 0, 1);
@@ -59,4 +66,3 @@ void loop() {
     lastNote = noteQuantized;
   }
 }
-
