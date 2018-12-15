@@ -27,7 +27,7 @@ boolean debugMe = false;
 void setup()
 {
   pinMode(TRIGGERPIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(TRIGGERPIN), tickInterrupt, RISING);
+  attachInterrupt(digitalPinToInterrupt(TRIGGERPIN), tickInterrupt, FALLING);
   pinMode(QTZOPTION, INPUT);
   if (debugMe)
   {
